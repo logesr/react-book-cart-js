@@ -1,15 +1,46 @@
-export function CartPreview({isVisible, onCartCloseClick}) {
+import {BookAuthors} from '../catalog/book-cards';
+import {Thumbnail} from '../common/book-thumbnail';
+import {BookTitle} from '../common/book-title';
+import {Link} from 'react-router-dom';
+
+export function CartPreview({isVisible, onCartCloseClick, items}) {
+  const visibilityClass = isVisible ? "block" : "hidden";
   return (
     <div
-      className={`${
-        isVisible ? "block" : "hidden"
-      } fixed top-16 right-0 bg-gray-200 w-1/4 h-screen opacity-95 z-10`}
+      className={`${visibilityClass} fixed top-16 right-0 bg-gray-200 w-1/4 h-screen opacity-95 z-10`}
     >
       <div className="flex flex-wrap flex-col">
         <CartHeader onCloseClick={onCartCloseClick}/>
-        <EmptyCartMessage/>
+        {items && items.length > 0 ? <OrderItems items={items}/> : <EmptyCartMessage/>}
       </div>
     </div>
+  );
+}
+
+function OrderItems({items}) {
+  return (
+    <div className="flex flex-wrap flex-col">
+      {items.map((item) => (
+        <OrderItem key={item.id} book={item}/>
+      ))}
+    </div>
+  );
+}
+
+function OrderItem({book}) {
+  return (
+    <Link title={book.title} to={`/books/${book.isbn}`}>
+      <div className="flex flex-wrap flex-row gap-1 m-1">
+        <div className="w-1/4">
+          <Thumbnail url={book.thumbnailUrl} title={book.title} size="small"/>
+        </div>
+        <div className="flex-1 flex flex-wrap flex-col items-start">
+          <BookTitle title={book.title} size="small"/>
+          <BookAuthors authors={book.authors} size="small"/>
+          <span className="text-xs font-bold text-gray-700">₹{book.price}</span>
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -23,6 +54,7 @@ function CartHeader({onCloseClick}) {
     </div>
   );
 }
+
 
 function EmptyCartMessage() {
   return (
@@ -69,7 +101,6 @@ function EmptyCartIcon({className}) {
     </svg>
   );
 }
-
 
 function CrossButton({onClick}) {
   return (

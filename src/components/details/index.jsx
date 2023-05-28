@@ -5,7 +5,7 @@ import {BookAuthors, BookPriceAndRating} from "../catalog/book-cards";
 import {Thumbnail} from "../common/book-thumbnail";
 import {BookTitle} from "../common/book-title";
 
-export function BookDetails() {
+export function BookDetails({onAddToCart}) {
   let {isbn} = useParams();
   const [book, setBook] = useState();
   useEffect(() => {
@@ -14,14 +14,14 @@ export function BookDetails() {
       return;
     }
     getBook(isbn).then((books) => setBook(books[0]));
-  },[]);
+  }, [isbn]);
 
   if (!book) {
     return <NoValidBookError/>;
   }
   return (
     <div className="flex flex-col justify-between">
-      <ValidBookDetails book={book}/>
+      <ValidBookDetails book={book} onAddToCart={onAddToCart}/>
     </div>
   );
 }
@@ -30,11 +30,12 @@ function NoValidBookError() {
   return <h1>No valid book details found</h1>;
 }
 
-function ValidBookDetails({book}) {
+function ValidBookDetails({book, onAddToCart}) {
   return (
     <div className="container mx-auto flex flex-wrap">
-      <div className="px-16 pt-16 pb-4 md:p-4 w-full md:w-1/4 ">
+      <div className="flex flex-wrap flex-col px-16 pt-16 pb-4 md:p-4 w-full md:w-1/4 ">
         <Thumbnail url={book.thumbnailUrl} title={book.title} size="large"></Thumbnail>
+        <AddToCartButton onAdd={() => onAddToCart(book)}/>
       </div>
       <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0 text-left">
         <BookTitle title={book.title} size="large"/>
@@ -45,6 +46,7 @@ function ValidBookDetails({book}) {
     </div>
   );
 }
+
 
 function BookDescription({book}) {
   return (
@@ -70,7 +72,7 @@ function BookDescription({book}) {
   }
 }
 
-function BookDescriptionLineItem({property,content}) {
+function BookDescriptionLineItem({property, content}) {
   return (
     <div className="flex items-center mb-4">
       <span className="text-gray-700 font-medium mr-2">{property}:</span>
@@ -78,3 +80,19 @@ function BookDescriptionLineItem({property,content}) {
     </div>
   );
 }
+
+
+function AddToCartButton({onAdd}) {
+  return (
+    <button
+      onClick={() => {
+        onAdd();
+      }}
+      className="w-full p-4 bg-orange-600 text-white text-xl font-bold hover:bg-orange-500 active:bg-orange-600 hover:text-gray-800 hover:outline hover:outline-orange-600"
+      title="Add To Cart"
+    >
+      Add To Cart
+    </button>
+  );
+}
+
