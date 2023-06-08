@@ -3,6 +3,8 @@ fileignoreconfig:
   checksum: dd6fa752ef26733ea15add88a5b298c1fdf3ca1831e9e4dcca861a1bfc4f0100
 - filename: server/package-lock.json
   checksum: 49f5248fb859ec38bd5d10f8a0a31cdd2f192265ede6a255ccb80dd07d7ae50c
+- filename: src/components/cart/index.jsx
+  checksum: d845877cd3ed2c9e315a11c05c552b0333789d0e11bcb56f4775a2459a7a364b
 - filename: src/components/catalog/book-cards.jsx
   checksum: 6333290b5694e0506d8c6461de7cc39d2b185f9eec96a664bfcd3d40b28c6ff7
 version: "1.0"

@@ -12,6 +12,7 @@ import { BookDetails } from "./components/details";
 import { Header } from "./components/common/header";
 import { Footer } from "./components/common/footer";
 import { CartPreview } from "./components/cart";
+import { BookCartContext } from "./contexts/context";
 
 function App() {
   const emptyBooks = [];
@@ -19,6 +20,7 @@ function App() {
   const [books, setBooks] = useState(emptyBooks);
   const [cart, setCart] = useState(emptyCart);
   const [isCartVisible, setIsCartVisible] = useState(false);
+
   useEffect(() => {
     getBooks().then(setBooks);
   }, []);
@@ -26,19 +28,21 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <CartPreview isVisible={isCartVisible} onCartCloseClick={hideCart} items={cart} />
-        <Header onCartClick={showCart} />
-        <Routes>
-          <Route
-            path="/books/:isbn"
-            element={<BookDetails onAddToCart={addBookToCart} />}
-          ></Route>
-          <Route
-            path="/books"
-            element={<Catalog items={books}></Catalog>}
-          ></Route>
-          <Route path="*" element={<Navigate to="/books" replace />} />
-        </Routes>
+        <BookCartContext.Provider value={{ cart, setCart }}>
+          <CartPreview isVisible={isCartVisible} onCartCloseClick={hideCart} />
+          <Header onCartClick={showCart} />
+          <Routes>
+            <Route
+              path="/books/:isbn"
+              element={<BookDetails onAddToCart={addBookToCart} />}
+            ></Route>
+            <Route
+              path="/books"
+              element={<Catalog items={books}></Catalog>}
+            ></Route>
+            <Route path="*" element={<Navigate to="/books" replace />} />
+          </Routes>
+        </BookCartContext.Provider>
         <Footer />
       </div>
     </Router>

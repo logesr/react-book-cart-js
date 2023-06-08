@@ -2,16 +2,21 @@ import {BookAuthors} from '../catalog/book-cards';
 import {Thumbnail} from '../common/book-thumbnail';
 import {BookTitle} from '../common/book-title';
 import {Link} from 'react-router-dom';
+import { useBookCartProps } from '../../contexts/context';
 
-export function CartPreview({isVisible, onCartCloseClick, items}) {
+export function CartPreview({isVisible, onCartCloseClick}) {
   const visibilityClass = isVisible ? "block" : "hidden";
+  const {cart :items}= useBookCartProps();
   return (
     <div
-      className={`${visibilityClass} fixed top-16 right-0 bg-gray-200 w-1/4 h-screen opacity-95 z-10`}
+      className={`${visibilityClass} fixed top-16 right-0 bg-gray-200 w-1/4 opacity-95 z-10`}
     >
-      <div className="flex flex-wrap flex-col">
+      <div className="flex flex-col">
         <CartHeader onCloseClick={onCartCloseClick}/>
-        {items && items.length > 0 ? <OrderItems items={items}/> : <EmptyCartMessage/>}
+        {items && items.length > 0 ? <>
+        <OrderItems items={items}/>
+        <TotalCartPrice items={items}/>
+        </> : <EmptyCartMessage/>}
       </div>
     </div>
   );
@@ -19,15 +24,16 @@ export function CartPreview({isVisible, onCartCloseClick, items}) {
 
 function OrderItems({items}) {
   return (
-    <div className="flex flex-wrap flex-col">
-      {items.map((item) => (
-        <OrderItem key={item.id} book={item}/>
+    <div className="flex flex-wrap flex-col mb-6">
+      {items.map((item,index) => (
+        <OrderItem key={index} book={item}/>
       ))}
     </div>
   );
 }
 
 function OrderItem({book}) {
+  const {setCart} = useBookCartProps();
   return (
     <Link title={book.title} to={`/books/${book.isbn}`}>
       <div className="flex flex-wrap flex-row gap-1 m-1">
@@ -37,7 +43,7 @@ function OrderItem({book}) {
         <div className="flex-1 flex flex-wrap flex-col items-start">
           <BookTitle title={book.title} size="small"/>
           <BookAuthors authors={book.authors} size="small"/>
-          <span className="text-xs font-bold text-gray-700">₹{book.price}</span>
+          <span className="text-xs font-bold text-gray-700">₹{calculateDiscountedPrice(book)}</span>
         </div>
       </div>
     </Link>
@@ -114,4 +120,17 @@ function CrossButton({onClick}) {
       X
     </button>
   );
+}
+
+function calculateDiscountedPrice(item){
+  return item.price*(100-item.discount)/100;
+}
+
+function TotalCartPrice({items}) {
+  const discountedPrice = items.reduce((total,item)=>{return total += calculateDiscountedPrice(item)}, 0);
+  return (
+    <div className='font-bold text-2xl flex mb-4 ml-6 w-full flex-wrap'>
+      <span className='w-70'>Subtotal ({items.length} item{items.length > 1 ? 's' : ''}) : ₹{discountedPrice}</span>
+    </div>
+  )
 }
